@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>CRUD Node.js and Mysql</title>
+</head>
+<body>
+  <div class="container">
+    <h2>person List</h2>
+    <div>
+      <div>
+        <span>id person</span>
+        <span>person Name</span>
+        <span>person lastname</span>
+      </div>
+      <div>
+        {{#each results}}
+        <div>
+          {{ id }} - {{ firstname }} - {{ lastname }}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Add New person Modal-->
+  <form action="/save" method="post">
+    <h2> Add New Person</h2>
+    <div class="">
+      <input type="text" name="name" class="" placeholder="new person name" required>
+    </div>
+  
+    <div class="">
+      <input type="text" name="lastname" class="" placeholder="new person lastname" required>
+    </div>
+  
+    <div class="">
+      <button type="submit" class=""> Add </button>
+    </div>
+  </form>
+
+  <!-- Edit person Modal-->
+  <form action="/update" method="post">
+    <h2> Update Person </h2>
+  
+    <div class="form-group">
+      <input type="text" name="name" class="" placeholder="person new name" required>
+    </div>
+  
+    <div class="form-group">
+      <input type="text" name="lastname" class="form-control price" placeholder="person new lastname" required>
+    </div>
+  
+    <input type="" name="id" class="" placeholder="id person to update">
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+
+  <!-- Delete person Modal-->
+  <form id="add-row-form" action="/delete" method="post">
+    <h2> Delete Person </h2>
+  
+    <input type="" name="id" placeholder="id person to delete" required>
+    <button type="submit" class="">Delete</button>
+  </form>
+
+
+  
+
+</body>
+</html>
