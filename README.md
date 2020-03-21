@@ -1,4 +1,4 @@
-# crud-snhm
+# 🎆 🎉 crud-snhm 🗃️ 🎉
 ## Description
 simple crud using nodejs mysql sequelize orm handlebars
 
