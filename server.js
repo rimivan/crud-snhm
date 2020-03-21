@@ -2,16 +2,22 @@ const path = require('path');
 const express = require('express');
 const hbs = require('hbs'); /* use hbs view engine */
 const bodyParser = require('body-parser');
-//use mysql database
-const mysql = require('mysql');
 const app = express();
-/** Sequelize */
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize'); /* sequelize ORM imported from node modules */
 
-const DB_HOST = require("./constants").host;
-const UserModel = require("./model/user").User;
+const DB_HOST = require("./constants").host; /* host path from constants */
+const UserModel = require("./model/user").User; /* user model from User */
 
+/* set views file and views engine */
+app.set('views',path.join(__dirname,'views'));
+app.set('view engine', 'hbs');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+/* set folder public as static folder for static file */
+/* TODO: Edit UI */
+app.use('/assets',express.static(__dirname + '/public'));
 
+/* sequelize setup to a simple MySql DB */
 let sequelize = new Sequelize('sequelize-db', 'root', 'root', {
   host: DB_HOST,
   dialect: 'mysql',
@@ -23,6 +29,7 @@ let sequelize = new Sequelize('sequelize-db', 'root', 'root', {
   }
 });
 
+/* sequelize connection to DB */
 sequelize.authenticate()
  .then(() => {
    console.log('Connection has been established successfully.');
@@ -33,24 +40,13 @@ sequelize.authenticate()
 
 const User = sequelize.define('user', UserModel);
 
-//set views file
-app.set('views',path.join(__dirname,'views'));
-//set view engine
-app.set('view engine', 'hbs');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-//set folder public as static folder for static file
-app.use('/assets',express.static(__dirname + '/public'));
-
-//route for homepage
+/* homepage GET method: it lists all users of DB */
 app.get('/',(req, res) => {
     User.findAll().then(users => {  
       let arrayRes = [];
-      console.log("------------------- FIND ALL [GET] ----------------------------");
        for(let u of users) {
         arrayRes.push(u.dataValues);
       } 
-      console.log(arrayRes);
       res.render('person_view',{
         results: arrayRes
       });
@@ -60,7 +56,8 @@ app.get('/',(req, res) => {
     });
 });
 
-//route for insert data
+/* POST method to insert a new user in DB */
+/* Name, Lastname from input; Age, Email set default in this example */
 app.post('/save',(req, res) => {
   let data = {name: req.body.name, lastname: req.body.lastname};
   User.create({ 
@@ -69,7 +66,6 @@ app.post('/save',(req, res) => {
     age: 20,
     email: 'default@example.com',
    }).then(user => {       
-       // Send created user to client
        console.log("Created User: ", user);
        res.redirect('/');
    }).catch(function (err) {
@@ -78,13 +74,9 @@ app.post('/save',(req, res) => {
    });
 });
 
-//route for update data
+/* POST method to update a user in DB(age set to 20 as default) */
 app.post('/update',(req, res) => {
   let data = {id: req.body.id,name: req.body.name, lastname: req.body.lastname};
-  console.log("REQ NAME --> ", data.name);
-  console.log("REQ LASTNAME --> ", data.lastname);
-  console.log("REQ ID --> ", data.id);
-
   User.update({
     firstname: data.name,
     lastname: data.lastname,
@@ -94,7 +86,6 @@ app.post('/update',(req, res) => {
       id: data.id
     }
   }).then(() => {
-    
     res.redirect('/');
   }).catch(function (err) {
     console.log("update failed with error: " + err);
@@ -103,14 +94,20 @@ app.post('/update',(req, res) => {
   
 });
 
-//route for delete data
+/* POST method to delete a user in DB(age set to 20 as default) */
 app.post('/delete',(req, res) => {
-    let sql = "DELETE FROM person WHERE id='"+req.body.id+"'";
-    console.log("Query DELETE --> ", sql);
-    let query = conn.query(sql, (err, results) => {
-        if(err) throw err;
+    let data = {id: req.body.id,name: req.body.name, lastname: req.body.lastname};
+
+    User.destroy({
+      where: { id: data.id }
+     }).then(() => {
+        console.log("deleted record with id",data.id);
         res.redirect('/');
-    });
+     }).catch(function (err) {
+        // handle error;
+        console.log("delete failed with error: " + err );
+        return 0;
+     });
 });
 
 //server listening
